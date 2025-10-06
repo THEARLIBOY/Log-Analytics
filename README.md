@@ -7,12 +7,6 @@
 
 A powerful, web-based log analysis application designed for ISP and office environments. Built with modern web technologies to provide comprehensive log parsing, analysis, and visualization capabilities.
 
-## 👨‍💻 Author & Contact
-
-**Author:** Rezaul Karim
-**Email:** [work.rezaul@outlook.com](mailto:work.rezaul@outlook.com)
-**Organization:** [REZ LAB](https://rezaulkarim.com)
-
 ## 🌟 Key Features
 
 ### 🔧 **Core Functionality**
@@ -288,6 +282,12 @@ For support, feature requests, or bug reports:
 ## 📜 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 👨‍💻 Author & Contact
+
+**Author:** Rezaul Karim
+**Email:** [work.rezaul@outlook.com](mailto:work.rezaul@outlook.com)
+**Organization:** [REZ LAB](https://rezaulkarim.com)
 
 ---
 
