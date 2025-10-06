@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Document metadata and external resources -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Log Analytics Dashboard</title>
+
+    <!-- External CSS resources -->
+    <!-- Google Fonts - Inter font family for modern, readable typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Feather Icons - Beautiful, customizable icons used throughout the interface -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.css" rel="stylesheet">
+    <!-- Application-specific styles -->
+    <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet">
+</head>
+<body>
+    <!-- Header Section -->
+    <!-- Contains application branding, title, and quick action buttons -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <!-- Logo and branding area -->
+                <div class="logo">
+                    <div class="logo-icon">📊</div>
+                    <div>
+                        <div class="logo-text">Log Analytics</div>
+                        <div class="logo-subtitle">Professional Log Analysis Tool</div>
+                    </div>
+                </div>
+                <!-- Header actions for quick access to common functions -->
+                <div class="header-actions">
+                    <!-- Button to load sample data for demonstration purposes -->
+                    <button class="btn btn-secondary" onclick="showSample()">
+                        <i data-feather="eye"></i>
+                        View Sample
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <!-- Upload Section -->
+            <!-- Primary interface for log file upload and text input -->
+            <div class="upload-section fade-in">
+                <!-- Section header with title and description -->
+                <h1 class="section-title">
+                    <i data-feather="upload-cloud"></i>
+                    Analyze Your Logs
+                </h1>
+                <p class="section-subtitle">
+                    Upload a log file or paste log content to get instant insights and analysis
+                </p>
+
+                <!-- File Upload Area -->
+                <!-- Drag and drop zone for log file uploads -->
+                <!-- Supports drag & drop functionality and click to browse -->
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">
+                        <i data-feather="file-text"></i>
+                    </div>
+                    <div class="upload-text">Drop your log file here</div>
+                    <div class="upload-hint">Supports .log, .txt files up to 50MB</div>
+                    <!-- Hidden file input element for security and compatibility -->
+                    <input type="file" class="file-input" id="fileInput" accept=".log,.txt">
+                </div>
+
+                <!-- Text Input Toggle -->
+                <div class="text-input-section">
+                    <div class="input-toggle" id="textInputToggle" onclick="toggleTextInput()">
+                        <i data-feather="edit-3"></i>
+                        <span>Paste logs directly</span>
+                    </div>
+                    <div class="textarea-container" id="textareaContainer">
+                        <textarea
+                            class="log-textarea"
+                            id="logTextarea"
+                            placeholder="Paste your log content here...&#10;&#10;Example:&#10;192.168.1.100 - - [10/Oct/2023:13:55:36] "GET /api/users HTTP/1.1" 200 1234"
+                        ></textarea>
+                    </div>
+                </div>
+
+                <!-- Filter Toggle -->
+                <div class="filter-section">
+                    <button class="btn btn-secondary" onclick="toggleFilters()" id="filterToggle">
+                        <i data-feather="filter"></i>
+                        <span>Show Filters</span>
+                    </button>
+
+                    <div class="filters-panel" id="filtersPanel">
+                        <div class="filters-header">
+                            <h3 class="filters-title">
+                                <i data-feather="filter"></i>
+                                Filter Options
+                            </h3>
+                            <p class="filters-subtitle">Refine your log analysis with specific criteria</p>
+                        </div>
+
+                        <div class="filters-grid">
+                            <!-- Date Range Filter -->
+                            <div class="filter-group">
+                                <label class="filter-label">
+                                    <i data-feather="calendar" class="filter-icon"></i>
+                                    Date Range
+                                </label>
+                                <div class="date-inputs">
+                                    <input type="datetime-local" class="filter-input" id="startDate" placeholder="Start Date">
+                                    <span>to</span>
+                                    <input type="datetime-local" class="filter-input" id="endDate" placeholder="End Date">
+                                </div>
+                            </div>
+
+                            <!-- IP Filter -->
+                            <div class="filter-group">
+                                <label class="filter-label">
+                                    <i data-feather="user" class="filter-icon"></i>
+                                    IP Address
+                                </label>
+                                <input type="text" class="filter-input" id="ipFilter" placeholder="e.g., 192.168.1">
+                            </div>
+
+                            <!-- Status Code Filter -->
+                            <div class="filter-group">
+                                <label class="filter-label">
+                                    <i data-feather="hash" class="filter-icon"></i>
+                                    Status Code
+                                </label>
+                                <select class="filter-input" id="statusFilter">
+                                    <option value="">All Status Codes</option>
+                                    <option value="200">200 OK</option>
+                                    <option value="404">404 Not Found</option>
+                                    <option value="500">500 Error</option>
+                                    <option value="401">401 Unauthorized</option>
+                                    <option value="403">403 Forbidden</option>
+                                </select>
+                            </div>
+
+                            <!-- URL Filter -->
+                            <div class="filter-group">
+                                <label class="filter-label">
+                                    <i data-feather="link" class="filter-icon"></i>
+                                    URL/Path
+                                </label>
+                                <input type="text" class="filter-input" id="urlFilter" placeholder="e.g., /api/users">
+                            </div>
+
+                            <!-- Search Filter -->
+                            <div class="filter-group">
+                                <label class="filter-label">
+                                    <i data-feather="search" class="filter-icon"></i>
+                                    Search Text
+                                </label>
+                                <input type="text" class="filter-input" id="searchText" placeholder="Search in logs...">
+                            </div>
+                        </div>
+
+                        <div class="filter-actions">
+                            <button class="btn btn-primary" onclick="applyFilters()">
+                                <i data-feather="filter"></i>
+                                Apply Filters
+                            </button>
+                            <button class="btn btn-secondary" onclick="clearFilters()">
+                                <i data-feather="x"></i>
+                                Clear Filters
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="analyzeLogs()">
+                        <i data-feather="play"></i>
+                        Analyze Logs
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearAll()">
+                        <i data-feather="refresh-ccw"></i>
+                        Clear
+                    </button>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="progress-bar" id="progressBar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <!-- Visual feedback shown during log analysis processing -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <div>Analyzing your logs...</div>
+                <div style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                    This may take a few moments for large files
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <!-- Container for displaying analysis results and insights -->
+            <div class="results-section" id="resultsSection">
+                <!-- Section header for results display -->
+                <h2 class="section-title">
+                    <i data-feather="bar-chart-3"></i>
+                    Analysis Results
+                </h2>
+
+                <!-- Grid layout for result cards populated by JavaScript -->
+                <div class="results-grid" id="resultsGrid">
+                    <!-- Results will be populated here -->
+                </div>
+
+                <!-- Export Section -->
+                <!-- Options for downloading analysis results in various formats -->
+                <div class="export-section">
+                    <h3 class="card-title">
+                        <i data-feather="download"></i>
+                        Export Results
+                    </h3>
+                    <div class="export-buttons">
+                        <!-- Export to CSV format for spreadsheet analysis -->
+                        <button class="btn btn-primary" onclick="exportResults('csv')">
+                            <i data-feather="file"></i>
+                            Download CSV
+                        </button>
+                        <!-- Export to plain text format for documentation -->
+                        <button class="btn btn-secondary" onclick="exportResults('txt')">
+                            <i data-feather="file-text"></i>
+                            Download TXT
+                        </button>
+                        <!-- Export to JSON format for programmatic use -->
+                        <button class="btn btn-secondary" onclick="exportResults('json')">
+                            <i data-feather="code"></i>
+                            Download JSON
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Section -->
+    <!-- Application footer with author information and branding -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <!-- Contact and author information -->
+                <div class="footer-info">
+                    <div class="author-info">
+                        <strong>Author:</strong> Rezaul Karim
+                    </div>
+                    <div class="email-info">
+                        <strong>Email:</strong> <a href="mailto:work.rezaul@outlook.com">work.rezaul@outlook.com</a>
+                    </div>
+                </div>
+                <!-- Company/brand information -->
+                <div class="powered-by">
+                    <strong>Powered By:</strong> REZ LAB
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- External JavaScript Libraries -->
+    <!-- Feather Icons - Icon rendering library, must be loaded before application scripts -->
+    <script src="https://unpkg.com/feather-icons"></script>
+    <!-- Application JavaScript - Main client-side functionality -->
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

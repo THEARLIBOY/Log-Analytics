@@ -1,0 +1,16 @@
+# Professional Log Analytics Tool - Requirements
+# A simple, beautiful web interface for log analysis
+#
+# Author: Rezaul Karim
+# Email: work.rezaul@outlook.com
+# Powered By: REZ LAB
+
+# Flask - Web framework for Python
+# Core web framework that provides the foundation for the log analytics application
+# Handles routing, request/response processing, templating, and web server functionality
+Flask==2.3.3
+
+# Werkzeug - WSGI utility library
+# Low-level WSGI utilities used by Flask for URL routing, request/response handling
+# Provides secure filename handling and other essential web utilities
+Werkzeug==2.3.7
