@@ -14,3 +14,8 @@ Flask==2.3.3
 # Low-level WSGI utilities used by Flask for URL routing, request/response handling
 # Provides secure filename handling and other essential web utilities
 Werkzeug==2.3.7
+
+# Production server for deployment (optional, for development use Flask's built-in server)
+# Uncomment the following lines for production deployment:
+# gunicorn==21.2.0
+# gevent==22.10.2

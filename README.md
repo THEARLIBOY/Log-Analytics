@@ -294,7 +294,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Author:** Rezaul Karim
 **Email:** [work.rezaul@outlook.com](mailto:work.rezaul@outlook.com)
-**Organization:** [REZ LAB](https://rezaulkarim.com)
+**Organization:** [REZ LAB](https://www.linkedin.com/in/rezaul-bd/)
 
 ## 🎯 Why Choose Log Analytics Tool?
 
@@ -475,6 +475,6 @@ A: Large files require more memory and processing time. Consider upgrading hardw
 
 **Built with ❤️ for ISP and office environments**
 
-**[REZ LAB](https://rezaulkarim.com) | [Email](mailto:work.rezaul@outlook.com) | [GitHub](https://github.com)**
+**[REZ LAB](https://www.linkedin.com/in/rezaul-bd/) | [Email](mailto:work.rezaul@outlook.com) | [GitHub](https://github.com/rezaworks)**
 
 </div>

@@ -22,7 +22,7 @@ import io
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'  # Directory for storing uploaded files and analysis results
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # Maximum file size: 50MB
-app.config['SECRET_KEY'] = 'log_analytics_secret_key_2024'  # Secret key for session management
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'  # Secret key for session management
 
 # Create uploads directory if it doesn't exist
 # This ensures the application can save uploaded files and analysis results
@@ -434,7 +434,7 @@ def analyze():
         if 'log_file' in request.files and request.files['log_file'].filename:
             # Handle file upload
             file = request.files['log_file']
-            filename = secure_filename(file.filename)  # Sanitize filename for security
+            filename = secure_filename(file.filename or 'uploaded_file.log')  # Sanitize filename for security
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(filepath)  # Save file to uploads directory
 
