@@ -1,15 +1,15 @@
-<p align="center">
-<h1>🔍 Log Analytics Tool</h1>
-</p>
+<div align="center">
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Version-1.0.0-blue.svg" alt="Version">
-  <img src="https://img.shields.io/badge/Python-3.7+-blue.svg" alt="Python">
-  <img src="https://img.shields.io/badge/Flask-2.3+-green.svg" alt="Flask">
-  <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License">
-  <img src="https://img.shields.io/badge/PRs-Welcome-brightgreen.svg" alt="PRs Welcome">
-  <img src="https://img.shields.io/badge/Platform-Cross--Platform-orange.svg" alt="Cross-Platform">
-</p>
+# 🔍 Log Analytics Tool
+
+[![Version](https://img.shields.io/badge/Version-1.0.0-blue.svg)](https://github.com/rezaworks/log-analytics)
+[![Python](https://img.shields.io/badge/Python-3.7+-blue.svg)](https://www.python.org/downloads/)
+[![Flask](https://img.shields.io/badge/Flask-2.3+-green.svg)](https://flask.palletsprojects.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-brightgreen.svg)](https://github.com/rezaworks/log-analytics)
+[![Platform](https://img.shields.io/badge/Platform-Cross--Platform-orange.svg)](https://github.com/rezaworks/log-analytics)
+
+</div>
 
 <p align="center">
   <strong>🚀 Professional Log Analysis Tool for ISP & Office Environments</strong>
