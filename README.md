@@ -473,8 +473,12 @@ A: Large files require more memory and processing time. Consider upgrading hardw
 
 <div align="center">
 
+## 🎯 **About This Project**
+
 **Built with ❤️ for ISP and office environments**
 
 **[REZ LAB](https://www.linkedin.com/in/rezaul-bd/) | [Email](mailto:work.rezaul@outlook.com) | [GitHub](https://github.com/rezaworks)**
+
+**⭐ If you find this project helpful, please give it a star!**
 
 </div>
