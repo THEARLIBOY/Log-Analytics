@@ -1,5 +1,5 @@
 <center>
-# 🔍 Log Analytics Tool
+<h1>🔍 Log Analytics Tool</h1>
 </center>
 
 <p align="center">
