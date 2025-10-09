@@ -1,3 +1,5 @@
+<div align="center">
+
 # 🔍 Log Analytics Tool
 
 <p align="center">
@@ -16,6 +18,8 @@
 <p align="center">
   A powerful, web-based log analysis application designed for ISP and office environments. Built with modern web technologies to provide comprehensive log parsing, analysis, and visualization capabilities.
 </p>
+
+</div>
 
 ---
 
