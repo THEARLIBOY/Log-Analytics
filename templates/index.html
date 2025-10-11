@@ -61,54 +61,72 @@
                     Upload a log file or paste log content to get instant insights and analysis
                 </p>
 
-                <!-- File Upload Area -->
-                <!-- Drag and drop zone for log file uploads -->
-                <!-- Supports drag & drop functionality and click to browse -->
+                <!-- Enhanced File Upload Area -->
+                <!-- Modern drag and drop zone with improved visual feedback -->
                 <div class="upload-area" id="uploadArea">
                     <div class="upload-icon">
                         <i data-feather="file-text"></i>
                     </div>
                     <div class="upload-text">Drop your log file here</div>
-                    <div class="upload-hint">Supports .log, .txt files up to 50MB</div>
+                    <div class="upload-hint">
+                        <i data-feather="info"></i>
+                        Supports .log, .txt files up to 50MB
+                    </div>
                     <!-- Hidden file input element for security and compatibility -->
                     <input type="file" class="file-input" id="fileInput" accept=".log,.txt">
                 </div>
 
-                <!-- Text Input Toggle -->
+                <!-- Enhanced Text Input Section -->
                 <div class="text-input-section">
                     <div class="input-toggle" id="textInputToggle" onclick="toggleTextInput()">
                         <i data-feather="edit-3"></i>
                         <span>Paste logs directly</span>
+                        <i data-feather="chevron-down" class="toggle-arrow"></i>
                     </div>
                     <div class="textarea-container" id="textareaContainer">
                         <textarea
                             class="log-textarea"
                             id="logTextarea"
-                            placeholder="Paste your log content here...&#10;&#10;Example:&#10;192.168.1.100 - - [10/Oct/2023:13:55:36] "GET /api/users HTTP/1.1" 200 1234"
+                            placeholder="Paste your log content here...&#10;&#10;Example:&#10;192.168.1.100 - - [10/Oct/2023:13:55:36] "GET /api/users HTTP/1.1" 200 1234&#10;192.168.1.101 - - [10/Oct/2023:13:55:37] "POST /api/login HTTP/1.1" 401 567"
+                            spellcheck="false"
+                            autocomplete="off"
                         ></textarea>
+                        <div class="textarea-footer">
+                            <span class="textarea-info">
+                                <i data-feather="info"></i>
+                                Supports web server logs, system logs, and custom formats
+                            </span>
+                            <span class="textarea-stats">
+                                <span id="charCount">0</span> characters
+                            </span>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Filter Toggle -->
+                <!-- Redesigned Filter Section -->
                 <div class="filter-section">
-                    <button class="btn btn-secondary" onclick="toggleFilters()" id="filterToggle">
-                        <i data-feather="filter"></i>
-                        <span>Show Filters</span>
-                    </button>
+                    <div class="filter-toggle-container">
+                        <button class="btn btn-secondary" onclick="toggleFilters()" id="filterToggle">
+                            <i data-feather="filter"></i>
+                            <span>Show Filters</span>
+                        </button>
+                    </div>
 
                     <div class="filters-panel" id="filtersPanel">
                         <div class="filters-header">
                             <h3 class="filters-title">
                                 <i data-feather="filter"></i>
-                                Filter Options
+                                Advanced Filters
                             </h3>
-                            <p class="filters-subtitle">Refine your log analysis with specific criteria</p>
+                            <p class="filters-subtitle">
+                                Refine your log analysis with precision filters. Select specific criteria to focus on the most relevant data for your investigation.
+                            </p>
                         </div>
 
                         <div class="filters-grid">
                             <!-- Date Range Filter -->
                             <div class="filter-group">
-                                <label class="filter-label">
+                                <label class="filter-label" for="startDate">
                                     <i data-feather="calendar" class="filter-icon"></i>
                                     Date Range
                                 </label>
@@ -119,59 +137,108 @@
                                 </div>
                             </div>
 
-                            <!-- IP Filter -->
+                            <!-- IP Address Filter -->
                             <div class="filter-group">
-                                <label class="filter-label">
+                                <label class="filter-label" for="ipFilter">
                                     <i data-feather="user" class="filter-icon"></i>
                                     IP Address
                                 </label>
-                                <input type="text" class="filter-input" id="ipFilter" placeholder="e.g., 192.168.1">
+                                <div class="filter-input-wrapper">
+                                    <input type="text" class="filter-input" id="ipFilter" placeholder="e.g., 192.168.1.100 or range">
+                                    <i data-feather="user" class="filter-input-icon"></i>
+                                </div>
                             </div>
 
-                            <!-- Status Code Filter -->
+                            <!-- HTTP Status Code Filter -->
                             <div class="filter-group">
-                                <label class="filter-label">
+                                <label class="filter-label" for="statusFilter">
                                     <i data-feather="hash" class="filter-icon"></i>
-                                    Status Code
+                                    HTTP Status
                                 </label>
-                                <select class="filter-input" id="statusFilter">
-                                    <option value="">All Status Codes</option>
-                                    <option value="200">200 OK</option>
-                                    <option value="404">404 Not Found</option>
-                                    <option value="500">500 Error</option>
-                                    <option value="401">401 Unauthorized</option>
-                                    <option value="403">403 Forbidden</option>
-                                </select>
+                                <div class="filter-input-wrapper">
+                                    <select class="filter-input" id="statusFilter">
+                                        <option value="">All Status Codes</option>
+                                        <option value="200">✅ 200 OK</option>
+                                        <option value="201">✅ 201 Created</option>
+                                        <option value="204">✅ 204 No Content</option>
+                                        <option value="301">↩️ 301 Moved</option>
+                                        <option value="400">❌ 400 Bad Request</option>
+                                        <option value="401">🔒 401 Unauthorized</option>
+                                        <option value="403">🚫 403 Forbidden</option>
+                                        <option value="404">❓ 404 Not Found</option>
+                                        <option value="500">💥 500 Server Error</option>
+                                        <option value="502">💥 502 Bad Gateway</option>
+                                        <option value="503">🚧 503 Service Unavailable</option>
+                                    </select>
+                                    <i data-feather="chevron-down" class="filter-input-icon"></i>
+                                </div>
                             </div>
 
-                            <!-- URL Filter -->
+                            <!-- URL/Path Filter -->
                             <div class="filter-group">
-                                <label class="filter-label">
+                                <label class="filter-label" for="urlFilter">
                                     <i data-feather="link" class="filter-icon"></i>
-                                    URL/Path
+                                    URL/Path Pattern
                                 </label>
-                                <input type="text" class="filter-input" id="urlFilter" placeholder="e.g., /api/users">
+                                <div class="filter-input-wrapper">
+                                    <input type="text" class="filter-input" id="urlFilter" placeholder="e.g., /api/users, /admin/*">
+                                    <i data-feather="link" class="filter-input-icon"></i>
+                                </div>
                             </div>
 
-                            <!-- Search Filter -->
+                            <!-- Search Text Filter -->
                             <div class="filter-group">
-                                <label class="filter-label">
+                                <label class="filter-label" for="searchText">
                                     <i data-feather="search" class="filter-icon"></i>
-                                    Search Text
+                                    Search Keywords
                                 </label>
-                                <input type="text" class="filter-input" id="searchText" placeholder="Search in logs...">
+                                <div class="filter-input-wrapper">
+                                    <input type="text" class="filter-input" id="searchText" placeholder="error, login, timeout, etc.">
+                                    <i data-feather="search" class="filter-input-icon"></i>
+                                </div>
+                            </div>
+
+                            <!-- Log Level Filter (if applicable) -->
+                            <div class="filter-group">
+                                <label class="filter-label" for="logLevelFilter">
+                                    <i data-feather="alert-circle" class="filter-icon"></i>
+                                    Log Level
+                                </label>
+                                <div class="filter-input-wrapper">
+                                    <select class="filter-input" id="logLevelFilter">
+                                        <option value="">All Levels</option>
+                                        <option value="ERROR">🔴 ERROR</option>
+                                        <option value="WARN">🟡 WARNING</option>
+                                        <option value="INFO">🔵 INFO</option>
+                                        <option value="DEBUG">🟣 DEBUG</option>
+                                        <option value="TRACE">⚪ TRACE</option>
+                                    </select>
+                                    <i data-feather="chevron-down" class="filter-input-icon"></i>
+                                </div>
                             </div>
                         </div>
 
+                        <!-- Filter Actions -->
                         <div class="filter-actions">
                             <button class="btn btn-primary" onclick="applyFilters()">
-                                <i data-feather="filter"></i>
+                                <i data-feather="play-circle"></i>
                                 Apply Filters
                             </button>
                             <button class="btn btn-secondary" onclick="clearFilters()">
-                                <i data-feather="x"></i>
-                                Clear Filters
+                                <i data-feather="rotate-ccw"></i>
+                                Reset All
                             </button>
+                        </div>
+
+                        <!-- Filter Summary/Preview -->
+                        <div class="filter-summary" id="filterSummary">
+                            <div class="filter-summary-title">
+                                <i data-feather="tag"></i>
+                                Active Filters
+                            </div>
+                            <div class="filter-summary-tags" id="filterTags">
+                                <!-- Active filter tags will be displayed here -->
+                            </div>
                         </div>
                     </div>
                 </div>

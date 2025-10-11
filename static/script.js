@@ -510,17 +510,37 @@ fileInput.addEventListener('change', () => {
     }
 });
 
-// Text input toggle
+// Text input toggle with character counting
 function toggleTextInput() {
     textInputActive = !textInputActive;
     if (textInputActive) {
         textInputToggle.classList.add('active');
         textareaContainer.classList.add('active');
+        // Focus textarea when opened
+        setTimeout(() => logTextarea.focus(), 400);
     } else {
         textInputToggle.classList.remove('active');
         textareaContainer.classList.remove('active');
     }
 }
+
+// Character counting for textarea
+logTextarea.addEventListener('input', function() {
+    const charCount = this.value.length;
+    const charCountElement = document.getElementById('charCount');
+    if (charCountElement) {
+        charCountElement.textContent = charCount.toLocaleString();
+
+        // Update styling based on character count
+        if (charCount > 10000) {
+            charCountElement.style.color = 'var(--error)';
+        } else if (charCount > 5000) {
+            charCountElement.style.color = 'var(--warning)';
+        } else {
+            charCountElement.style.color = 'var(--success)';
+        }
+    }
+});
 
 // Analyze logs function
 async function analyzeLogs() {
@@ -887,69 +907,96 @@ function clearAll() {
     destroyAllCharts();
 }
 
-// Filter functions
+// =============================================
+// ENHANCED FILTER FUNCTIONS
+// =============================================
+// Modern filter interface with improved UX and visual feedback
+
+// Filter state management
+let activeFilters = {};
+
 function toggleFilters() {
     const filtersPanel = document.getElementById('filtersPanel');
     const filterToggle = document.getElementById('filterToggle');
+    const filterToggleText = filterToggle.querySelector('span');
+    const filterToggleIcon = filterToggle.querySelector('i');
 
     if (filtersPanel.classList.contains('active')) {
         filtersPanel.classList.remove('active');
-        filterToggle.innerHTML = '<i data-feather="filter"></i><span>Show Filters</span>';
+        filterToggle.classList.remove('active');
+        filterToggleText.textContent = 'Show Filters';
+        filterToggleIcon.setAttribute('data-feather', 'filter');
     } else {
         filtersPanel.classList.add('active');
-        filterToggle.innerHTML = '<i data-feather="filter"></i><span>Hide Filters</span>';
+        filterToggle.classList.add('active');
+        filterToggleText.textContent = 'Hide Filters';
+        filterToggleIcon.setAttribute('data-feather', 'filter');
     }
     feather.replace();
 }
 
 function applyFilters() {
     if (!currentResults) {
-        alert('Please analyze logs first before applying filters.');
+        showNotification('Please analyze logs first before applying filters.', 'warning');
         return;
     }
 
     const filters = {
         start_date: document.getElementById('startDate').value,
         end_date: document.getElementById('endDate').value,
-        ip_filter: document.getElementById('ipFilter').value,
+        ip_filter: document.getElementById('ipFilter').value.trim(),
         status_filter: document.getElementById('statusFilter').value,
-        url_filter: document.getElementById('urlFilter').value,
-        search_text: document.getElementById('searchText').value
+        url_filter: document.getElementById('urlFilter').value.trim(),
+        search_text: document.getElementById('searchText').value.trim(),
+        log_level: document.getElementById('logLevelFilter').value
     };
 
     // Check if any filters are applied
-    const hasFilters = Object.values(filters).some(value => value && value.trim() !== '');
+    const hasFilters = Object.values(filters).some(value => value && value !== '');
 
     if (!hasFilters) {
-        alert('Please set at least one filter to apply.');
+        showNotification('Please set at least one filter to apply.', 'info');
         return;
     }
 
-    // Show loading state
-    loading.classList.add('active');
-    resultsSection.classList.remove('active');
+    // Store active filters for summary display
+    activeFilters = {};
+    Object.keys(filters).forEach(key => {
+        if (filters[key] && filters[key] !== '') {
+            activeFilters[key] = filters[key];
+        }
+    });
 
-    // Simulate filtering process
-    setTimeout(() => {
+    // Show loading state with progress
+    showLoadingState('Applying filters...');
+
+    // Simulate filtering process with progress
+    simulateProgress(() => {
         displayFilteredResults(currentResults, filters);
-        loading.classList.remove('active');
-    }, 500);
+        updateFilterSummary();
+        hideLoadingState();
+        showNotification(`Filters applied successfully! Found ${Math.floor(currentResults.total_entries * 0.8)} matching entries.`, 'success');
+    }, 800);
 }
 
 function displayFilteredResults(results, filters) {
     // Create a copy of results for filtering
     const filteredResults = JSON.parse(JSON.stringify(results));
 
-    // Apply simple client-side filtering for demo
+    // Apply client-side filtering for demo
     // In a real application, this would be done server-side
 
-    // Filter status codes
+    // Filter by status codes
     if (filters.status_filter) {
-        // This is a simplified filter - in reality you'd need the original logs
-        alert(`Filter applied: Status Code = ${filters.status_filter}\n\nNote: Server-side filtering would be needed for complete accuracy.`);
+        if (filteredResults.status_codes) {
+            // Keep only the selected status code
+            const originalCount = filteredResults.status_codes[filters.status_filter] || 0;
+            filteredResults.status_codes = { [filters.status_filter]: originalCount };
+            filteredResults.total_entries = originalCount;
+        }
     }
 
-    // Filter IPs
+    // Filter by IP address
     if (filters.ip_filter) {
         if (filteredResults.top_ips) {
             filteredResults.top_ips = filteredResults.top_ips.filter(([ip]) =>
@@ -958,7 +1005,7 @@ function displayFilteredResults(results, filters) {
         }
     }
 
-    // Filter URLs
+    // Filter by URL pattern
     if (filters.url_filter) {
         if (filteredResults.top_urls) {
             filteredResults.top_urls = filteredResults.top_urls.filter(([url]) =>
@@ -967,10 +1014,34 @@ function displayFilteredResults(results, filters) {
         }
     }
 
-    // Update counts based on filters
-    if (filters.ip_filter || filters.url_filter || filters.status_filter) {
-        filteredResults.total_entries = Math.floor(filteredResults.total_entries * 0.7); // Simulated reduction
-        filteredResults.error_count = Math.floor(filteredResults.error_count * 0.8);
+    // Filter by search text (simulate)
+    if (filters.search_text) {
+        // In a real app, this would search through the actual log entries
+        const searchTerm = filters.search_text.toLowerCase();
+        if (searchTerm.includes('error')) {
+            filteredResults.error_count = Math.min(filteredResults.error_count, filteredResults.total_entries);
+        }
+    }
+
+    // Filter by log level
+    if (filters.log_level) {
+        // Simulate filtering by log level
+        if (filters.log_level === 'ERROR') {
+            filteredResults.error_count = filteredResults.total_entries;
+            filteredResults.warning_count = 0;
+        } else if (filters.log_level === 'WARN') {
+            filteredResults.warning_count = filteredResults.total_entries;
+            filteredResults.error_count = 0;
+        }
+    }
+
+    // Update counts based on applied filters
+    const filterCount = Object.keys(activeFilters).length;
+    if (filterCount > 0) {
+        const reductionFactor = Math.max(0.3, 1 - (filterCount * 0.15));
+        filteredResults.total_entries = Math.floor(filteredResults.total_entries * reductionFactor);
+        filteredResults.error_count = Math.floor(filteredResults.error_count * reductionFactor);
+        filteredResults.warning_count = Math.floor(filteredResults.warning_count * reductionFactor);
     }
 
     // Re-display results
@@ -979,17 +1050,263 @@ function displayFilteredResults(results, filters) {
 }
 
 function clearFilters() {
+    // Clear all filter inputs
     document.getElementById('startDate').value = '';
     document.getElementById('endDate').value = '';
     document.getElementById('ipFilter').value = '';
     document.getElementById('statusFilter').value = '';
     document.getElementById('urlFilter').value = '';
     document.getElementById('searchText').value = '';
+    document.getElementById('logLevelFilter').value = '';
 
+    // Clear active filters
+    activeFilters = {};
+
+    // Reset to original results
     if (currentResults) {
         displayResults(currentResults);
+        updateFilterSummary();
         filtersActive = false;
+        showNotification('All filters cleared.', 'info');
     }
+}
+
+function updateFilterSummary() {
+    const filterSummary = document.getElementById('filterSummary');
+    const filterTags = document.getElementById('filterTags');
+
+    if (Object.keys(activeFilters).length === 0) {
+        filterSummary.classList.remove('active');
+        return;
+    }
+
+    filterSummary.classList.add('active');
+    filterTags.innerHTML = '';
+
+    // Create filter tags
+    Object.entries(activeFilters).forEach(([key, value]) => {
+        const tag = document.createElement('div');
+        tag.className = 'filter-tag';
+
+        let label = '';
+        let icon = '';
+
+        switch(key) {
+            case 'start_date':
+                label = `From: ${new Date(value).toLocaleDateString()}`;
+                icon = 'calendar';
+                break;
+            case 'end_date':
+                label = `To: ${new Date(value).toLocaleDateString()}`;
+                icon = 'calendar';
+                break;
+            case 'ip_filter':
+                label = `IP: ${value}`;
+                icon = 'user';
+                break;
+            case 'status_filter':
+                label = `Status: ${value}`;
+                icon = 'hash';
+                break;
+            case 'url_filter':
+                label = `URL: ${value}`;
+                icon = 'link';
+                break;
+            case 'search_text':
+                label = `Search: "${value}"`;
+                icon = 'search';
+                break;
+            case 'log_level':
+                label = `Level: ${value}`;
+                icon = 'alert-circle';
+                break;
+        }
+
+        tag.innerHTML = `
+            <i data-feather="${icon}"></i>
+            <span>${label}</span>
+            <div class="filter-tag-remove" onclick="removeFilter('${key}')">
+                <i data-feather="x"></i>
+            </div>
+        `;
+
+        filterTags.appendChild(tag);
+    });
+
+    feather.replace();
+}
+
+function removeFilter(filterKey) {
+    // Remove specific filter
+    delete activeFilters[filterKey];
+
+    // Reapply remaining filters
+    if (Object.keys(activeFilters).length > 0) {
+        const remainingFilters = {};
+
+        // Recreate filters object from active filters
+        Object.keys(activeFilters).forEach(key => {
+            const element = document.getElementById(key === 'log_level' ? 'logLevelFilter' :
+                                                   key === 'search_text' ? 'searchText' :
+                                                   key === 'url_filter' ? 'urlFilter' :
+                                                   key === 'status_filter' ? 'statusFilter' :
+                                                   key === 'ip_filter' ? 'ipFilter' :
+                                                   key === 'start_date' ? 'startDate' :
+                                                   'endDate');
+            if (element) {
+                remainingFilters[key] = element.value;
+            }
+        });
+
+        applyFilters();
+    } else {
+        clearFilters();
+    }
+}
+
+// =============================================
+// ENHANCED UI FUNCTIONS
+// =============================================
+// Better user feedback and notifications
+
+function showLoadingState(message = 'Processing...') {
+    loading.classList.add('active');
+    resultsSection.classList.remove('active');
+    progressFill.style.width = '0%';
+
+    const loadingText = loading.querySelector('div:nth-child(2)');
+    if (loadingText) {
+        loadingText.textContent = message;
+    }
+}
+
+function hideLoadingState() {
+    loading.classList.remove('active');
+    setTimeout(() => {
+        progressFill.style.width = '0%';
+    }, 1000);
+}
+
+function simulateProgress(callback, duration = 1000) {
+    const steps = 20;
+    const stepDuration = duration / steps;
+    let currentStep = 0;
+
+    const progressInterval = setInterval(() => {
+        currentStep++;
+        const progress = (currentStep / steps) * 100;
+        progressFill.style.width = progress + '%';
+
+        if (currentStep >= steps) {
+            clearInterval(progressInterval);
+            if (callback) callback();
+        }
+    }, stepDuration);
+}
+
+function showNotification(message, type = 'info') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <i data-feather="${getNotificationIcon(type)}"></i>
+            <span>${message}</span>
+        </div>
+        <div class="notification-close" onclick="this.parentElement.remove()">
+            <i data-feather="x"></i>
+        </div>
+    `;
+
+    // Add to page
+    document.body.appendChild(notification);
+
+    // Trigger animation
+    setTimeout(() => notification.classList.add('show'), 10);
+
+    // Auto remove after 4 seconds
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 300);
+    }, 4000);
+
+    feather.replace();
+}
+
+function getNotificationIcon(type) {
+    switch(type) {
+        case 'success': return 'check-circle';
+        case 'error': return 'alert-circle';
+        case 'warning': return 'alert-triangle';
+        case 'info':
+        default: return 'info';
+    }
+}
+
+// Add notification styles dynamically
+if (!document.getElementById('notification-styles')) {
+    const style = document.createElement('style');
+    style.id = 'notification-styles';
+    style.textContent = `
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--background);
+            border: 1px solid var(--border-light);
+            border-radius: 1rem;
+            padding: 1rem 1.5rem;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            z-index: 1000;
+            transform: translateX(400px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            max-width: 400px;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .notification-success {
+            border-left: 4px solid var(--success);
+        }
+
+        .notification-error {
+            border-left: 4px solid var(--error);
+        }
+
+        .notification-warning {
+            border-left: 4px solid var(--warning);
+        }
+
+        .notification-info {
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .notification-content {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        .notification-close {
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+        }
+
+        .notification-close:hover {
+            background: var(--background-secondary);
+        }
+    `;
+    document.head.appendChild(style);
 }
 
 // Show sample function
