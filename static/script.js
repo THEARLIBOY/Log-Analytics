@@ -1,6 +1,71 @@
 // Initialize Feather icons
 feather.replace();
 
+// =============================================
+// DARK MODE FUNCTIONALITY
+// =============================================
+// Theme management with localStorage persistence
+function initializeTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    // Use saved theme, or default to system preference, or default to light
+    const theme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+    setTheme(theme);
+
+    // Update toggle button
+    updateThemeToggle(theme);
+}
+
+function setTheme(theme) {
+    if (theme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+    } else {
+        document.documentElement.removeAttribute('data-theme');
+    }
+    localStorage.setItem('theme', theme);
+}
+
+function toggleDarkMode() {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+    setTheme(newTheme);
+    updateThemeToggle(newTheme);
+
+    // Add a subtle animation effect
+    document.body.style.transition = 'background-color 0.3s ease, color 0.3s ease';
+    setTimeout(() => {
+        document.body.style.transition = '';
+    }, 300);
+}
+
+function updateThemeToggle(theme) {
+    const themeIcon = document.getElementById('themeIcon');
+    const themeText = document.getElementById('themeText');
+
+    if (theme === 'dark') {
+        themeIcon.setAttribute('data-feather', 'moon');
+        themeText.textContent = 'Dark Mode';
+    } else {
+        themeIcon.setAttribute('data-feather', 'sun');
+        themeText.textContent = 'Light Mode';
+    }
+
+    // Re-render Feather icons
+    feather.replace();
+}
+
+// Listen for system theme changes
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    // Only auto-update if user hasn't manually set a preference
+    if (!localStorage.getItem('theme')) {
+        const theme = e.matches ? 'dark' : 'light';
+        setTheme(theme);
+        updateThemeToggle(theme);
+    }
+});
+
 /*
  * Professional Log Analytics Tool - JavaScript
  * A simple, beautiful web interface for log analysis
@@ -568,4 +633,5 @@ function showSample() {
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
     feather.replace();
+    initializeTheme();
 });
