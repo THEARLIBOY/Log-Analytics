@@ -11,6 +11,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Feather Icons - Beautiful, customizable icons used throughout the interface -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.css" rel="stylesheet">
+    <!-- Chart.js - For interactive data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Application-specific styles -->
     <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet">
 </head>
@@ -214,6 +216,40 @@
                 <!-- Grid layout for result cards populated by JavaScript -->
                 <div class="results-grid" id="resultsGrid">
                     <!-- Results will be populated here -->
+                </div>
+
+                <!-- Charts Section -->
+                <!-- Interactive data visualization for analysis results -->
+                <div class="charts-section" id="chartsSection">
+                    <h3 class="card-title">
+                        <i data-feather="trending-up"></i>
+                        Data Visualization
+                    </h3>
+                    <div class="charts-grid">
+                        <!-- Status Code Distribution Chart -->
+                        <div class="chart-container">
+                            <h4 class="chart-title">HTTP Status Distribution</h4>
+                            <canvas id="statusChart" width="400" height="300"></canvas>
+                        </div>
+
+                        <!-- Top IPs Chart -->
+                        <div class="chart-container">
+                            <h4 class="chart-title">Top IP Addresses</h4>
+                            <canvas id="ipsChart" width="400" height="300"></canvas>
+                        </div>
+
+                        <!-- Timeline Chart -->
+                        <div class="chart-container">
+                            <h4 class="chart-title">Request Timeline</h4>
+                            <canvas id="timelineChart" width="400" height="300"></canvas>
+                        </div>
+
+                        <!-- Error Rate Trend -->
+                        <div class="chart-container">
+                            <h4 class="chart-title">Error Rate Trend</h4>
+                            <canvas id="errorChart" width="400" height="300"></canvas>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Export Section -->

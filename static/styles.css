@@ -497,6 +497,86 @@ body {
     justify-content: center;
 }
 
+/* =============================================
+   CHARTS SECTION STYLES
+   =============================================
+   Interactive data visualization with Chart.js
+   Responsive charts with dark mode support
+*/
+.charts-section {
+    background: var(--background);
+    border-radius: 1rem;
+    padding: 2rem;
+    margin-top: 2rem;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-light);
+}
+
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2rem;
+    margin-top: 1.5rem;
+}
+
+.chart-container {
+    background: var(--background-secondary);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    border: 1px solid var(--border-light);
+    transition: all 0.3s ease;
+}
+
+.chart-container:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+.chart-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.chart-title::before {
+    content: '';
+    width: 4px;
+    height: 16px;
+    background: var(--primary-color);
+    border-radius: 2px;
+}
+
+/* Chart.js dark mode styling */
+[data-theme="dark"] .chart-container {
+    background: var(--background-tertiary);
+}
+
+[data-theme="dark"] canvas {
+    filter: invert(1) hue-rotate(180deg);
+}
+
+/* Responsive chart adjustments */
+@media (max-width: 768px) {
+    .charts-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .chart-container {
+        padding: 1rem;
+    }
+
+    .charts-section {
+        padding: 1.5rem 1rem;
+    }
+}
+
 /* Filter Section */
 .filter-section {
     margin-top: 2rem;

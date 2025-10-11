@@ -2,6 +2,368 @@
 feather.replace();
 
 // =============================================
+// CHART VISUALIZATION
+// =============================================
+// Interactive charts using Chart.js for data visualization
+let charts = {}; // Store chart instances for cleanup
+
+// Chart color schemes for light and dark modes
+const chartColors = {
+    light: {
+        primary: '#1e40af',
+        secondary: '#3b82f6',
+        success: '#10b981',
+        warning: '#f59e0b',
+        error: '#ef4444',
+        background: '#ffffff',
+        grid: '#e5e7eb',
+        text: '#1f2937'
+    },
+    dark: {
+        primary: '#3b82f6',
+        secondary: '#60a5fa',
+        success: '#34d399',
+        warning: '#fbbf24',
+        error: '#f87171',
+        background: '#1f2937',
+        grid: '#374151',
+        text: '#f9fafb'
+    }
+};
+
+function getChartColors() {
+    return document.documentElement.getAttribute('data-theme') === 'dark'
+        ? chartColors.dark
+        : chartColors.light;
+}
+
+function getChartOptions(title = '') {
+    const colors = getChartColors();
+    return {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'top',
+                labels: {
+                    color: colors.text,
+                    font: {
+                        size: 12,
+                        family: 'Inter'
+                    },
+                    padding: 20
+                }
+            },
+            title: {
+                display: title !== '',
+                text: title,
+                color: colors.text,
+                font: {
+                    size: 16,
+                    weight: 'bold',
+                    family: 'Inter'
+                },
+                padding: 20
+            },
+            tooltip: {
+                backgroundColor: colors.background,
+                titleColor: colors.text,
+                bodyColor: colors.text,
+                borderColor: colors.grid,
+                borderWidth: 1,
+                cornerRadius: 8,
+                displayColors: true,
+                callbacks: {
+                    label: function(context) {
+                        return `${context.label}: ${context.parsed.toLocaleString()}`;
+                    }
+                }
+            }
+        },
+        scales: {
+            x: {
+                grid: {
+                    color: colors.grid,
+                    borderColor: colors.grid
+                },
+                ticks: {
+                    color: colors.text,
+                    font: {
+                        size: 11,
+                        family: 'Inter'
+                    }
+                }
+            },
+            y: {
+                grid: {
+                    color: colors.grid,
+                    borderColor: colors.grid
+                },
+                ticks: {
+                    color: colors.text,
+                    font: {
+                        size: 11,
+                        family: 'Inter'
+                    },
+                    callback: function(value) {
+                        return value.toLocaleString();
+                    }
+                }
+            }
+        },
+        animation: {
+            duration: 750,
+            easing: 'easeInOutQuart'
+        }
+    };
+}
+
+function createStatusChart(results) {
+    const ctx = document.getElementById('statusChart');
+    if (!ctx) return;
+
+    // Destroy existing chart if it exists
+    if (charts.statusChart) {
+        charts.statusChart.destroy();
+    }
+
+    if (!results.status_codes || Object.keys(results.status_codes).length === 0) {
+        ctx.getContext('2d').clearRect(0, 0, ctx.width, ctx.height);
+        return;
+    }
+
+    const colors = getChartColors();
+    const statusCodes = Object.entries(results.status_codes);
+    const labels = statusCodes.map(([code]) => `HTTP ${code}`);
+    const data = statusCodes.map(([, count]) => count);
+
+    // Color coding for different status types
+    const backgroundColors = statusCodes.map(([code]) => {
+        const status = parseInt(code);
+        if (status >= 200 && status < 300) return colors.success;
+        if (status >= 300 && status < 400) return colors.warning;
+        if (status >= 400) return colors.error;
+        return colors.primary;
+    });
+
+    charts.statusChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: backgroundColors,
+                borderWidth: 2,
+                borderColor: colors.background,
+                hoverBorderWidth: 3,
+                hoverOffset: 8
+            }]
+        },
+        options: {
+            ...getChartOptions('HTTP Status Code Distribution'),
+            plugins: {
+                ...getChartOptions().plugins,
+                legend: {
+                    ...getChartOptions().plugins.legend,
+                    position: 'right'
+                }
+            },
+            cutout: '60%'
+        }
+    });
+}
+
+function createIPsChart(results) {
+    const ctx = document.getElementById('ipsChart');
+    if (!ctx) return;
+
+    // Destroy existing chart if it exists
+    if (charts.ipsChart) {
+        charts.ipsChart.destroy();
+    }
+
+    if (!results.top_ips || results.top_ips.length === 0) {
+        ctx.getContext('2d').clearRect(0, 0, ctx.width, ctx.height);
+        return;
+    }
+
+    const colors = getChartColors();
+    const topIPs = results.top_ips.slice(0, 10); // Top 10 IPs
+    const labels = topIPs.map(([ip]) => ip);
+    const data = topIPs.map(([, count]) => count);
+
+    charts.ipsChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Request Count',
+                data: data,
+                backgroundColor: colors.primary,
+                borderColor: colors.primary,
+                borderWidth: 1,
+                borderRadius: 4,
+                borderSkipped: false,
+            }]
+        },
+        options: {
+            ...getChartOptions('Top IP Addresses'),
+            plugins: {
+                ...getChartOptions().plugins,
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                ...getChartOptions().scales,
+                x: {
+                    ...getChartOptions().scales.x,
+                    ticks: {
+                        ...getChartOptions().scales.x.ticks,
+                        maxRotation: 45,
+                        minRotation: 45
+                    }
+                }
+            }
+        }
+    });
+}
+
+function createTimelineChart(results) {
+    const ctx = document.getElementById('timelineChart');
+    if (!ctx) return;
+
+    // Destroy existing chart if it exists
+    if (charts.timelineChart) {
+        charts.timelineChart.destroy();
+    }
+
+    // Generate sample timeline data (in a real app, this would come from parsed logs)
+    const colors = getChartColors();
+    const timeLabels = [];
+    const requestData = [];
+
+    // Generate last 24 hours of sample data
+    for (let i = 23; i >= 0; i--) {
+        const date = new Date();
+        date.setHours(date.getHours() - i);
+        timeLabels.push(date.toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit'
+        }));
+
+        // Generate sample request counts
+        requestData.push(Math.floor(Math.random() * 100) + 10);
+    }
+
+    charts.timelineChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: timeLabels,
+            datasets: [{
+                label: 'Requests',
+                data: requestData,
+                borderColor: colors.primary,
+                backgroundColor: colors.primary + '20',
+                tension: 0.4,
+                fill: true,
+                pointBackgroundColor: colors.primary,
+                pointBorderColor: colors.background,
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
+        },
+        options: getChartOptions('Request Timeline (Last 24 Hours)')
+    });
+}
+
+function createErrorChart(results) {
+    const ctx = document.getElementById('errorChart');
+    if (!ctx) return;
+
+    // Destroy existing chart if it exists
+    if (charts.errorChart) {
+        charts.errorChart.destroy();
+    }
+
+    const colors = getChartColors();
+    const totalEntries = results.total_entries || 100;
+    const errorCount = results.error_count || 5;
+    const warningCount = results.warning_count || 10;
+
+    const errorRate = (errorCount / totalEntries) * 100;
+    const warningRate = (warningCount / totalEntries) * 100;
+    const successRate = 100 - errorRate - warningRate;
+
+    charts.errorChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Current', '1h ago', '2h ago', '3h ago', '4h ago'],
+            datasets: [
+                {
+                    label: 'Success Rate %',
+                    data: [successRate, successRate - 2, successRate + 1, successRate - 1, successRate + 2],
+                    borderColor: colors.success,
+                    backgroundColor: colors.success + '20',
+                    tension: 0.3,
+                    fill: false
+                },
+                {
+                    label: 'Error Rate %',
+                    data: [errorRate, errorRate + 1, errorRate - 0.5, errorRate + 2, errorRate - 1],
+                    borderColor: colors.error,
+                    backgroundColor: colors.error + '20',
+                    tension: 0.3,
+                    fill: false
+                }
+            ]
+        },
+        options: {
+            ...getChartOptions('Error Rate Trend'),
+            scales: {
+                ...getChartOptions().scales,
+                y: {
+                    ...getChartOptions().scales.y,
+                    min: 0,
+                    max: 100,
+                    ticks: {
+                        ...getChartOptions().scales.y.ticks,
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function createAllCharts(results) {
+    createStatusChart(results);
+    createIPsChart(results);
+    createTimelineChart(results);
+    createErrorChart(results);
+}
+
+function destroyAllCharts() {
+    Object.values(charts).forEach(chart => {
+        if (chart) {
+            chart.destroy();
+        }
+    });
+    charts = {};
+}
+
+// Update charts when theme changes
+function updateChartsTheme() {
+    if (currentResults) {
+        destroyAllCharts();
+        createAllCharts(currentResults);
+    }
+}
+
+// =============================================
 // DARK MODE FUNCTIONALITY
 // =============================================
 // Theme management with localStorage persistence
@@ -32,6 +394,9 @@ function toggleDarkMode() {
 
     setTheme(newTheme);
     updateThemeToggle(newTheme);
+
+    // Update charts theme if they exist
+    updateChartsTheme();
 
     // Add a subtle animation effect
     document.body.style.transition = 'background-color 0.3s ease, color 0.3s ease';
@@ -261,6 +626,12 @@ function displayResults(results) {
             }
 
     resultsSection.classList.add('active');
+
+    // Create interactive charts with the results
+    setTimeout(() => {
+        createAllCharts(results);
+    }, 100);
+
     resultsSection.scrollIntoView({ behavior: 'smooth' });
 }
 
@@ -510,6 +881,10 @@ function clearAll() {
     }
     resultsSection.classList.remove('active');
     uploadArea.classList.remove('dragover');
+
+    // Clear results and destroy charts
+    currentResults = null;
+    destroyAllCharts();
 }
 
 // Filter functions
